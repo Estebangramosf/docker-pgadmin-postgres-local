@@ -1,0 +1,43 @@
+version: '3'
+
+services:
+  postgres-database:
+    # image: postgres:11
+    build:
+      context: .
+      dockerfile: Postgresql.Dockerfile
+    hostname: postgres
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: "Postgres2019!"
+      POSTGRES_HOST: 0.0.0.0
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgresdbdata:/var/lib/postgresql/data
+      #- ./conf.d/pg_hba.conf:/var/lib/postgresql/data/pg_hba.conf
+      #- ./conf.d/postgres.conf:/etc/postgresql.conf
+    #command: postgres -c config_file=/etc/postgresql.conf
+    restart: always
+    networks:
+      - postgres-network
+      
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "yourmail@ptk.com"
+      PGADMIN_DEFAULT_PASSWORD: "PgAdmin2019!"
+    ports:
+      - "16543:80"
+    depends_on:
+      - postgres-database
+    networks:
+      - postgres-network
+
+volumes:
+  postgresdbdata:
+
+networks: 
+  postgres-network:
+    driver: bridge
